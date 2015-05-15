@@ -8,11 +8,11 @@ public class Piece {
 
 	private final char symbol;
 	private final boolean isCentral;
-	private final boolean isRotationalSymmetric;
+	private final boolean isPointSymmetric;
 	private final boolean[][] shape;
-	private final boolean[][] shapeUpsideDown;
+	private final boolean[][] shapeRotated;
 	private final String shapeText;
-	private final String shapeUpsideDownText;
+	private final String shapeRotatedText;
 	private final int columns;
 	private final int rows;
 
@@ -43,10 +43,10 @@ public class Piece {
 		rows = shape.length;
 		columns = shape[0].length;
 
-		shapeUpsideDown = new boolean[rows][columns];
+		shapeRotated = new boolean[rows][columns];
 		for (int row = 0; row < rows; row++) {
 			for (int column = 0; column < columns; column++)
-				shapeUpsideDown[rows - 1 - row][columns - 1 - column] = shape[row][column];
+				shapeRotated[rows - 1 - row][columns - 1 - column] = shape[row][column];
 		}
 
 		StringBuilder builder = new StringBuilder();
@@ -60,12 +60,12 @@ public class Piece {
 		builder = new StringBuilder();
 		for (int row = 0; row < rows; row++) {
 			for (int column = 0; column < columns; column++)
-				builder.append(shapeUpsideDown[row][column] ? symbol : ' ');
+				builder.append(shapeRotated[row][column] ? symbol : ' ');
 			builder.append("\n");
 		}
-		shapeUpsideDownText = builder.toString();
+		shapeRotatedText = builder.toString();
 
-		isRotationalSymmetric = shapeText.equals(shapeUpsideDownText);
+		isPointSymmetric = shapeText.equals(shapeRotatedText);
 	}
 
 	public int getColumns() {
@@ -80,16 +80,16 @@ public class Piece {
 		return isCentral;
 	}
 
-	public boolean isRotationalSymmetric() {
-		return isRotationalSymmetric;
+	public boolean isPointSymmetric() {
+		return isPointSymmetric;
 	}
 
 	public String getShapeText() {
 		return shapeText;
 	}
 
-	public String getShapeUpsideDownText() {
-		return shapeUpsideDownText;
+	public String getShapeRotatedText() {
+		return shapeRotatedText;
 	}
 
 	@Override
@@ -97,7 +97,7 @@ public class Piece {
 		return "Piece{" +
 				"symbol=" + symbol +
 				", isCentral=" + isCentral +
-				", isRotationalSymmetric=" + isRotationalSymmetric +
+				", isPointSymmetric=" + isPointSymmetric +
 				", columns=" + columns +
 				", rows=" + rows +
 				'}';
@@ -107,8 +107,8 @@ public class Piece {
 		for (Piece piece : PIECES) {
 			System.out.println(piece + "\n");
 			System.out.println(piece.getShapeText());
-			if (!piece.isRotationalSymmetric())
-				System.out.println(piece.getShapeUpsideDownText());
+			if (!piece.isPointSymmetric())
+				System.out.println(piece.getShapeRotatedText());
 		}
 	}
 }
