@@ -1,6 +1,11 @@
 package de.scrum_master.games.logiq_tower;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Piece {
+	public static final List<Piece> PIECES = new ArrayList<>();
+
 	private final char symbol;
 	private final boolean isCentral;
 	private final boolean isRotationalSymmetric;
@@ -10,6 +15,25 @@ public class Piece {
 	private final String shapeUpsideDownText;
 	private final int columns;
 	private final int rows;
+
+	static {
+		PIECES.add(new Piece('0', true, new boolean[][] { { true,  true  } }));
+		PIECES.add(new Piece('1', true, new boolean[][] { { true,  false, true  } }));
+		PIECES.add(new Piece('2', true, new boolean[][] { { true,  false, false,  true  } }));
+		PIECES.add(new Piece('3', true, new boolean[][] { { true,  false, false,  false, true  } }));
+		PIECES.add(new Piece('4', true, new boolean[][] { { true,  false, false,  false, false, true  } }));
+
+		PIECES.add(new Piece('I', false, new boolean[][] { { true,  true,  true,  true,  true  } }));
+		PIECES.add(new Piece('Y', false, new boolean[][] { { false, false, true,  false }, { true,  true,  true,  true  } }));
+		PIECES.add(new Piece('L', false, new boolean[][] { { false, false, false, true  }, { true,  true,  true,  true  } }));
+		PIECES.add(new Piece('N', false, new boolean[][] { { false, false, true,  true  }, { true,  true,  true,  false } }));
+		PIECES.add(new Piece('U', false, new boolean[][] { { true,  false, true  }, { true,  true,  true  } }));
+		PIECES.add(new Piece('Q', false, new boolean[][] { { true,  true,  true  }, { true,  true,  false } }));
+		PIECES.add(new Piece('W', false, new boolean[][] { { false, false, true  }, { false, true,  true  }, { true,  true,  false } }));
+		PIECES.add(new Piece('F', false, new boolean[][] { { false, true,  false }, { true,  true,  true  }, { true,  false, false } }));
+		PIECES.add(new Piece('T', false, new boolean[][] { { true,  true,  true  }, { false, true,  false }, { false, true,  false } }));
+		PIECES.add(new Piece('S', false, new boolean[][] { { false, true,  true  }, { false, true,  false }, { true,  true,  false } }));
+	}
 
 	public Piece(char symbol, boolean isCentral, boolean[][] shape) {
 		this.symbol = symbol;
