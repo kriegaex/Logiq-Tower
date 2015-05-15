@@ -5,8 +5,8 @@ import java.util.Stack;
 public class PlayingField {
 	private static final char NULL_CHAR = '\u0000';
 
-	private final int columns = 12;
 	private final int rows;
+	private final int columns = 12;
 
 	private boolean[][] isBlocked;
 	private char[][] blockedByPiece;
@@ -18,15 +18,15 @@ public class PlayingField {
 			throw new IllegalFieldSizeException("illegal number of rows " + rows + ", must be [2..5]");
 		this.rows = rows;
 
-		isBlocked = new boolean[columns][rows];
-		blockedByPiece = new char[columns][rows];
+		isBlocked = new boolean[rows][columns];
+		blockedByPiece = new char[rows][columns];
 	}
 
 	public boolean isSquareBlocked(int column, int row) {
-		return isBlocked[column][row];
+		return isBlocked[row][column];
 	}
 
 	public boolean isSquareAvailable(int column, int row) {
-		return !isBlocked[column][row];
+		return !isBlocked[row][column];
 	}
 }
