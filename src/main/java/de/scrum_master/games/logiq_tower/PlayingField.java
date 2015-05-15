@@ -22,11 +22,11 @@ public class PlayingField {
 		blockedByPiece = new char[rows][columns];
 	}
 
-	public boolean isSquareBlocked(int column, int row) {
+	public boolean isSquareBlocked(int row, int column) {
 		return isBlocked[row][column];
 	}
 
-	public boolean isSquareAvailable(int column, int row) {
+	public boolean isSquareAvailable(int row, int column) {
 		return !isBlocked[row][column];
 	}
 }
