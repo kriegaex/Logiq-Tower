@@ -18,6 +18,7 @@ public class PlayingField {
 	private char[][] blockedByPiece;
 
 	private Stack<Move> moves = new Stack<>();
+	private Set<Piece> pieces = new HashSet<>();
 
 	private int freeCubesCount;
 
@@ -86,12 +87,14 @@ public class PlayingField {
 		}
 		freeCubesCount -= piece.getCubeCount();
 		piece.setAvailable(false);
+		pieces.add(piece);
 		return moves.push(move);
 	}
 
 	public Move pop() {
 		Move move = moves.pop();
 		Piece piece = move.getPiece();
+		pieces.remove(piece);
 		int row = move.getRow();
 		int column = move.getColumn();
 		boolean isRotated = move.isRotated();
@@ -117,7 +120,7 @@ public class PlayingField {
 
 	public boolean canBePlayed(Move move) {
 		Piece piece = move.getPiece();
-		if (moves.stream().map(Move::getPiece).filter(p -> p == piece).count() > 0)
+		if (pieces.contains(piece))
 			return false;
 		int row = move.getRow();
 		int column = move.getColumn();
