@@ -4,3 +4,6 @@ target/
 # IntelliJ IDEA
 *.iml
 .idea/
+
+# Others
+*.log
