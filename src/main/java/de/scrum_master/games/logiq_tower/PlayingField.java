@@ -71,20 +71,9 @@ public class PlayingField {
 		int column = move.getColumn();
 		boolean isRotated = move.isRotated();
 
-		for (int y = 0; y < piece.getRows(); y++) {
-			for (int x = 0; x < piece.getColumns(); x++) {
-				if (isRotated) {
-					if (piece.getShapeRotated()[y][x]) {
-						isBlocked[row + y][(column + x) % columns] = true;
-					}
-				}
-				else {
-					if (piece.getShape()[y][x]) {
-						isBlocked[row + y][(column + x) % columns] = true;
-					}
-				}
-			}
-		}
+		for (int[] coordinates : piece.getBlockedPositionsAt(row, column, isRotated))
+			isBlocked[coordinates[0]][coordinates[1]] = true;
+
 		freeCubesCount -= piece.getCubeCount();
 		piece.setAvailable(false);
 		pieces.add(piece);
@@ -101,20 +90,9 @@ public class PlayingField {
 
 		piece.setAvailable(true);
 		freeCubesCount += piece.getCubeCount();
-		for (int y = 0; y < piece.getRows(); y++) {
-			for (int x = 0; x < piece.getColumns(); x++) {
-				if (isRotated) {
-					if (piece.getShapeRotated()[y][x]) {
-						isBlocked[row + y][(column + x) % columns] = false;
-					}
-				}
-				else {
-					if (piece.getShape()[y][x]) {
-						isBlocked[row + y][(column + x) % columns] = false;
-					}
-				}
-			}
-		}
+		for (int[] coordinates : piece.getBlockedPositionsAt(row, column, isRotated))
+			isBlocked[coordinates[0]][coordinates[1]] = false;
+
 		return move;
 	}
 
@@ -132,13 +110,10 @@ public class PlayingField {
 		for (int arrayRow = 0; arrayRow < rows; arrayRow++)
 			System.arraycopy(isBlocked[arrayRow], 0, floodFillArray[arrayRow], 0, columns);
 
-		int[][] blockedPositions = isRotated
-			? piece.getBlockedPositionsRotatedAt(row, column)
-			: piece.getBlockedPositionsAt(row, column);
-		for (int i = 0; i < blockedPositions.length; i++) {
-			if (isBlocked[blockedPositions[i][0]][blockedPositions[i][1]])
+		for (int[] coordinates : piece.getBlockedPositionsAt(row, column, isRotated)) {
+			if (isBlocked[coordinates[0]][coordinates[1]])
 				return false;
-			floodFillArray[blockedPositions[i][0]][blockedPositions[i][1]] = true;
+			floodFillArray[coordinates[0]][coordinates[1]] = true;
 		}
 
 		for (int floodFillRow = 0; floodFillRow < rows; floodFillRow++) {
@@ -171,12 +146,9 @@ public class PlayingField {
 			int column = move.getColumn();
 			Piece piece = move.getPiece();
 			char symbol = piece.getSymbol();
-			int[][] blockedPositions = move.isRotated()
-				? piece.getBlockedPositionsRotatedAt(row, column)
-				: piece.getBlockedPositionsAt(row, column);
-			for (int i = 0; i < blockedPositions.length; i++) {
-				blockedByPiece[blockedPositions[i][0]][blockedPositions[i][1]] = symbol;
-			}
+			boolean isRotated = move.isRotated();
+			for (int[] coordinates : piece.getBlockedPositionsAt(row, column, isRotated))
+				blockedByPiece[coordinates[0]][coordinates[1]] = symbol;
 		}
 	}
 
@@ -242,11 +214,11 @@ public class PlayingField {
 
 	public static void main(String[] args) throws IllegalFieldSizeException {
 		PlayingField playingField = new PlayingField(2);
-		playingField.push(new Move(Piece.CENTRAL_PIECES.get(0), 0, 0, false));
-		playingField.push(new Move(Piece.OUTER_PIECES.get(4), 0, 4, true));
-		playingField.push(new Move(Piece.OUTER_PIECES.get(8), 2, 7, false));
+		playingField.push(Move.createMove(Piece.CENTRAL_PIECES.get(0), 0, 0, false));
+		playingField.push(Move.createMove(Piece.OUTER_PIECES.get(4), 0, 4, true));
+		playingField.push(Move.createMove(Piece.OUTER_PIECES.get(8), 2, 7, false));
 		playingField.pop();
-		playingField.push(new Move(Piece.OUTER_PIECES.get(8), 2, 11, false));
+		playingField.push(Move.createMove(Piece.OUTER_PIECES.get(8), 2, 11, false));
 		System.out.print(playingField.getText());
 	}
 }

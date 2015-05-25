@@ -1,11 +1,15 @@
 package de.scrum_master.games.logiq_tower;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Piece {
 	public static final List<Piece> CENTRAL_PIECES = new ArrayList<>();
 	public static final List<Piece> OUTER_PIECES   = new ArrayList<>();
+	public static final Set<Piece> CENTRAL_PIECES_AVAILABLE = new HashSet<>();
+	public static final Set<Piece> OUTER_PIECES_AVAILABLE   = new HashSet<>();
 
 	private final char symbol;
 	private final boolean isCentral;
@@ -33,6 +37,9 @@ public class Piece {
 		CENTRAL_PIECES.add(new Piece(true, "3···3"));
 		CENTRAL_PIECES.add(new Piece(true, "4····4"));
 
+		for (Piece piece : CENTRAL_PIECES)
+			CENTRAL_PIECES_AVAILABLE.add(piece);
+
 		// Outer pieces have the following properties:
 		//  - 1 <= height <= 3, i.e. they can block cubes in multiple columns
 		//  - often not point-symmetric
@@ -47,6 +54,9 @@ public class Piece {
 		OUTER_PIECES.add(new Piece(false, "·F·,FFF,F··"));
 		OUTER_PIECES.add(new Piece(false, "TTT,·T·,·T·"));
 		OUTER_PIECES.add(new Piece(false, "·SS,·S·,SS·"));
+
+		for (Piece piece : OUTER_PIECES)
+			OUTER_PIECES_AVAILABLE.add(piece);
 	}
 
 	public char getSymbol() {
@@ -61,12 +71,10 @@ public class Piece {
 		return shapeRotated;
 	}
 
-	public int[][] getBlockedPositionsAt(int row, int column) {
-		return blockedPositions[row][column];
-	}
-
-	public int[][] getBlockedPositionsRotatedAt(int row, int column) {
-		return blockedPositionsRotated[row][column];
+	public int[][] getBlockedPositionsAt(int row, int column, boolean isRotated) {
+		return isRotated
+			? blockedPositionsRotated[row][column]
+			: blockedPositions[row][column];
 	}
 
 	public Piece(char symbol, boolean isCentral, boolean[][] shape) {
@@ -172,7 +180,19 @@ public class Piece {
 	}
 
 	public void setAvailable(boolean available) {
-		this.available = available;
+//		this.available = available;
+		if (available) {
+			if (isCentral)
+				CENTRAL_PIECES_AVAILABLE.add(this);
+			else
+				OUTER_PIECES_AVAILABLE.add(this);
+		}
+		else {
+			if (isCentral)
+				CENTRAL_PIECES_AVAILABLE.remove(this);
+			else
+				OUTER_PIECES_AVAILABLE.remove(this);
+		}
 	}
 
 	public boolean isCentral() {

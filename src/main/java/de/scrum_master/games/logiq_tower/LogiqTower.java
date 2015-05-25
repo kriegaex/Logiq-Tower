@@ -1,5 +1,6 @@
 package de.scrum_master.games.logiq_tower;
 
+import java.util.HashSet;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -17,49 +18,42 @@ public class LogiqTower {
 		int movesPlayed = playingField.getMovesPlayed();
 		if (movesPlayed == 0) {
 			// Play first central piece as anker at (0,0)
-			Piece.CENTRAL_PIECES
-				.stream()
-				.filter(Piece::isAvailable)
-				.forEach(piece -> {
-					Move move = new Move(piece, 0, 0, false);
-					playingField.push(move);
-					solve();
-					playingField.pop();
-				});
-		} else if (movesPlayed < playingField.getRows()) {
-			// Play more central pieces
-			Piece.CENTRAL_PIECES
-				.stream()
-				.filter(Piece::isAvailable)
-				.forEach(piece -> {
-					for (int column = 0; column < playingField.getColumns(); column++) {
-						Move move = new Move(piece, movesPlayed, column, false);
+			for (Piece piece : new HashSet<Piece>(Piece.CENTRAL_PIECES_AVAILABLE)) {
+				Move move = Move.createMove(piece, 0, 0, false);
+				playingField.push(move);
+				solve();
+				playingField.pop();
+			}
+		} else {
+			int columns = playingField.getColumns();
+			if (movesPlayed < playingField.getRows()) {
+				// Play more central pieces
+				for (Piece piece : new HashSet<Piece>(Piece.CENTRAL_PIECES_AVAILABLE)) {
+					for (int column = 0; column < columns; column++) {
+						Move move = Move.createMove(piece, movesPlayed, column, false);
 						if (playingField.canBePlayed(move)) {
 							playingField.push(move);
 							solve();
 							playingField.pop();
 						}
 					}
-				});
-		} else if (playingField.getFreeCubesCount() == 0) {
-			// Solution found => print it
-			String playingFieldText = playingField.getText();
-			if (!solutions.add(playingFieldText))
-				return;
-			solutionCount++;
-			java.awt.Toolkit.getDefaultToolkit().beep();
-			System.out.printf("Solution #%d, found after %.3f sec%n", solutionCount, (System.nanoTime() - startTimeNano) / 1e9);
-			System.out.println(playingFieldText);
-		} else {
-			// Play outer pieces
-			Piece.OUTER_PIECES
-				.stream()
-				.filter(Piece::isAvailable)
-				.forEach(piece -> {
+				}
+			} else if (playingField.getFreeCubesCount() == 0) {
+				// Solution found => print it
+				String playingFieldText = playingField.getText();
+				if (!solutions.add(playingFieldText))
+					return;
+				solutionCount++;
+				java.awt.Toolkit.getDefaultToolkit().beep();
+				System.out.printf("Solution #%d, found after %.3f sec%n", solutionCount, (System.nanoTime() - startTimeNano) / 1e9);
+				System.out.println(playingFieldText);
+			} else {
+				// Play outer pieces
+				for (Piece piece : new HashSet<Piece>(Piece.OUTER_PIECES_AVAILABLE)) {
 					int maxRow = playingField.getRows() - piece.getRows();
 					for (int row = 0; row <= maxRow; row++) {
-						for (int column = 0; column < playingField.getColumns(); column++) {
-							Move move = new Move(piece, row, column, false);
+						for (int column = 0; column < columns; column++) {
+							Move move = Move.createMove(piece, row, column, false);
 							if (playingField.canBePlayed(move)) {
 								playingField.push(move);
 								solve();
@@ -67,7 +61,7 @@ public class LogiqTower {
 							}
 							if (!piece.isPointSymmetric())
 								continue;
-							move = new Move(piece, row, column, true);
+							move = Move.createMove(piece, row, column, true);
 							if (playingField.canBePlayed(move)) {
 								playingField.push(move);
 								solve();
@@ -75,7 +69,8 @@ public class LogiqTower {
 							}
 						}
 					}
-				});
+				}
+			}
 		}
 	}
 
