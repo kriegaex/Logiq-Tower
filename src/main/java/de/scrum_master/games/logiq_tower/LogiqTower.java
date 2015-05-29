@@ -16,6 +16,7 @@ public class LogiqTower {
 
 	public void solve() {
 		int movesPlayed = playingField.getMovesPlayed();
+		int columns = playingField.getColumns();
 		if (movesPlayed == 0) {
 			// Play first central piece as anker at (0,0)
 			for (Piece piece : new HashSet<Piece>(Piece.CENTRAL_PIECES_AVAILABLE)) {
@@ -24,49 +25,46 @@ public class LogiqTower {
 				solve();
 				playingField.pop();
 			}
+		} else if (movesPlayed < playingField.getRows()) {
+			// Play more central pieces
+			for (Piece piece : new HashSet<Piece>(Piece.CENTRAL_PIECES_AVAILABLE)) {
+				for (int column = 0; column < columns; column++) {
+					Move move = Move.createMove(piece, movesPlayed, column, false);
+					if (playingField.canBePlayed(move)) {
+						playingField.push(move);
+						solve();
+						playingField.pop();
+					}
+				}
+			}
+		} else if (playingField.getFreeCubesCount() == 0) {
+			// Solution found => print it
+			String playingFieldText = playingField.getText();
+			if (!solutions.add(playingFieldText))
+				return;
+			solutionCount++;
+			java.awt.Toolkit.getDefaultToolkit().beep();
+			System.out.printf("Solution #%d, found after %.3f sec%n", solutionCount, (System.nanoTime() - startTimeNano) / 1e9);
+			System.out.println(playingFieldText);
 		} else {
-			int columns = playingField.getColumns();
-			if (movesPlayed < playingField.getRows()) {
-				// Play more central pieces
-				for (Piece piece : new HashSet<Piece>(Piece.CENTRAL_PIECES_AVAILABLE)) {
+			// Play outer pieces
+			for (Piece piece : new HashSet<Piece>(Piece.OUTER_PIECES_AVAILABLE)) {
+				int maxRow = playingField.getRows() - piece.getRows();
+				for (int row = 0; row <= maxRow; row++) {
 					for (int column = 0; column < columns; column++) {
-						Move move = Move.createMove(piece, movesPlayed, column, false);
+						Move move = Move.createMove(piece, row, column, false);
 						if (playingField.canBePlayed(move)) {
 							playingField.push(move);
 							solve();
 							playingField.pop();
 						}
-					}
-				}
-			} else if (playingField.getFreeCubesCount() == 0) {
-				// Solution found => print it
-				String playingFieldText = playingField.getText();
-				if (!solutions.add(playingFieldText))
-					return;
-				solutionCount++;
-				java.awt.Toolkit.getDefaultToolkit().beep();
-				System.out.printf("Solution #%d, found after %.3f sec%n", solutionCount, (System.nanoTime() - startTimeNano) / 1e9);
-				System.out.println(playingFieldText);
-			} else {
-				// Play outer pieces
-				for (Piece piece : new HashSet<Piece>(Piece.OUTER_PIECES_AVAILABLE)) {
-					int maxRow = playingField.getRows() - piece.getRows();
-					for (int row = 0; row <= maxRow; row++) {
-						for (int column = 0; column < columns; column++) {
-							Move move = Move.createMove(piece, row, column, false);
-							if (playingField.canBePlayed(move)) {
-								playingField.push(move);
-								solve();
-								playingField.pop();
-							}
-							if (!piece.isPointSymmetric())
-								continue;
-							move = Move.createMove(piece, row, column, true);
-							if (playingField.canBePlayed(move)) {
-								playingField.push(move);
-								solve();
-								playingField.pop();
-							}
+						if (!piece.isPointSymmetric())
+							continue;
+						move = Move.createMove(piece, row, column, true);
+						if (playingField.canBePlayed(move)) {
+							playingField.push(move);
+							solve();
+							playingField.pop();
 						}
 					}
 				}
