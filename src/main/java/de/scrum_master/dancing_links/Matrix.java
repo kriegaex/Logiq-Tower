@@ -27,12 +27,11 @@ public class Matrix {
 		return this;
 	}
 
-	public Matrix addRowOfNodes(String... nodeInfos) {
+	public Matrix addRowOfNodes(List<String> nodeNames) {
 		Node firstNode = null;
 		Node previousNode = null;
-		for (String nodeInfo : nodeInfos) {
-			int separatorIndex = nodeInfo.indexOf("|");
-			Node node = createNode(nodeInfo.substring(0, separatorIndex), nodeInfo.substring(separatorIndex + 1));
+		for (String nodeInfo : nodeNames) {
+			Node node = createNode(nodeInfo);
 			if (firstNode == null)
 				firstNode = previousNode = node;
 			node.right = firstNode;
@@ -44,8 +43,12 @@ public class Matrix {
 		return this;
 	}
 
-	public Node createNode(String nodeName, String columnName) {
-		return new Node(nodeName, columns.get(columnName));
+	public Matrix addRowOfNodes(String... nodeNames) {
+		return addRowOfNodes(Arrays.asList(nodeNames));
+	}
+
+	public Node createNode(String columnName) {
+		return new Node(columns.get(columnName));
 	}
 
 	@Override
@@ -56,6 +59,7 @@ public class Matrix {
 	}
 
 	public String toMultiLineText() {
+		// TODO: print line-wise, not column-wise
 		if (rootObject.right == rootObject)
 			return "<empty matrix>\n";
 		StringBuilder buffer = new StringBuilder();
@@ -72,12 +76,12 @@ public class Matrix {
 		Matrix matrix = new Matrix("Test matrix");
 		matrix
 			.addColumns("A", "B", "C", "D", "E")
-			.addRowOfNodes("A0|A", "D0|D")
-			.addRowOfNodes("B1|B", "C1|C", "D1|D")
-			.addRowOfNodes("D2|D", "E2|E")
-			.addRowOfNodes("A3|A", "E3|E")
-			.addRowOfNodes("B4|B", "C4|C")
-			.addRowOfNodes("E5|E");
+			.addRowOfNodes("A", "D")
+			.addRowOfNodes("B", "C", "D")
+			.addRowOfNodes("D", "E")
+			.addRowOfNodes("A", "E")
+			.addRowOfNodes("B", "C")
+			.addRowOfNodes("E");
 		System.out.println(matrix.toMultiLineText());
 	}
 }

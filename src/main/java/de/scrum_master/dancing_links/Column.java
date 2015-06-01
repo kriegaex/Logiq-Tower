@@ -2,10 +2,12 @@ package de.scrum_master.dancing_links;
 
 public class Column extends Node {
 	int size = 0;
+	String name;
 
 	public Column(String name) {
-		super(name, null);
+		super(null);
 		this.column = this;
+		this.name = name;
 	}
 
 	public Column addNode(Node node) {
