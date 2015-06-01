@@ -11,9 +11,9 @@ public class Matrix {
 		this.name = name;
 	}
 
-	public Matrix addColumn(Column column) {
-//		assert columns.put(column.name, column) == null;
-		columns.put(column.name, column);
+	public Matrix addColumn(Column column) throws ColumnAlreadyExistsException {
+		if (columns.put(column.name, column) != null)
+			throw new ColumnAlreadyExistsException("column '" + column.name + "' already exists");
 		column.left = rootObject.left;
 		column.right = rootObject;
 		rootObject.left.right = column;
@@ -21,11 +21,18 @@ public class Matrix {
 		return this;
 	}
 
-	public Matrix addRowOfNodes(List<Map.Entry<String, String>> nodeInfos) {
+	public Matrix addColumns(String... columnNames) throws ColumnAlreadyExistsException {
+		for (String columnName : columnNames)
+			addColumn(new Column(columnName));
+		return this;
+	}
+
+	public Matrix addRowOfNodes(String... nodeInfos) {
 		Node firstNode = null;
 		Node previousNode = null;
-		for (Map.Entry<String, String> nodeInfo : nodeInfos) {
-			Node node = createNode(nodeInfo.getKey(), nodeInfo.getValue());
+		for (String nodeInfo : nodeInfos) {
+			int separatorIndex = nodeInfo.indexOf("|");
+			Node node = createNode(nodeInfo.substring(0, separatorIndex), nodeInfo.substring(separatorIndex + 1));
 			if (firstNode == null)
 				firstNode = previousNode = node;
 			node.right = firstNode;
@@ -61,46 +68,16 @@ public class Matrix {
 		return buffer.toString();
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws ColumnAlreadyExistsException {
 		Matrix matrix = new Matrix("Test matrix");
-//		System.out.println(matrix.toMultiLineText());
 		matrix
-			.addColumn(new Column("A"))
-			.addColumn(new Column("B"))
-			.addColumn(new Column("C"))
-			.addColumn(new Column("D"))
-			.addColumn(new Column("E"));
-//		System.out.println(matrix.toMultiLineText());
-		List<Map.Entry<String, String>> nodeInfos = new ArrayList<>();
-		nodeInfos.add(new AbstractMap.SimpleEntry<String, String>("A0", "A"));
-		nodeInfos.add(new AbstractMap.SimpleEntry<String, String>("D0", "D"));
-		matrix.addRowOfNodes(nodeInfos);
-//		System.out.println(matrix.toMultiLineText());
-		nodeInfos.clear();
-		nodeInfos.add(new AbstractMap.SimpleEntry<String, String>("B1", "B"));
-		nodeInfos.add(new AbstractMap.SimpleEntry<String, String>("C1", "C"));
-		nodeInfos.add(new AbstractMap.SimpleEntry<String, String>("D1", "D"));
-		matrix.addRowOfNodes(nodeInfos);
-//		System.out.println(matrix.toMultiLineText());
-		nodeInfos.clear();
-		nodeInfos.add(new AbstractMap.SimpleEntry<String, String>("D2", "D"));
-		nodeInfos.add(new AbstractMap.SimpleEntry<String, String>("E2", "E"));
-		matrix.addRowOfNodes(nodeInfos);
-//		System.out.println(matrix.toMultiLineText());
-		nodeInfos.clear();
-		nodeInfos.add(new AbstractMap.SimpleEntry<String, String>("A3", "A"));
-		nodeInfos.add(new AbstractMap.SimpleEntry<String, String>("E3", "E"));
-		matrix.addRowOfNodes(nodeInfos);
-//		System.out.println(matrix.toMultiLineText());
-		nodeInfos.clear();
-		nodeInfos.add(new AbstractMap.SimpleEntry<String, String>("B4", "B"));
-		nodeInfos.add(new AbstractMap.SimpleEntry<String, String>("C4", "C"));
-		matrix.addRowOfNodes(nodeInfos);
-//		System.out.println(matrix.toMultiLineText());
-		nodeInfos.clear();
-		nodeInfos.add(new AbstractMap.SimpleEntry<String, String>("E5", "E"));
-		matrix.addRowOfNodes(nodeInfos);
-		nodeInfos.clear();
+			.addColumns("A", "B", "C", "D", "E")
+			.addRowOfNodes("A0|A", "D0|D")
+			.addRowOfNodes("B1|B", "C1|C", "D1|D")
+			.addRowOfNodes("D2|D", "E2|E")
+			.addRowOfNodes("A3|A", "E3|E")
+			.addRowOfNodes("B4|B", "C4|C")
+			.addRowOfNodes("E5|E");
 		System.out.println(matrix.toMultiLineText());
 	}
 }
