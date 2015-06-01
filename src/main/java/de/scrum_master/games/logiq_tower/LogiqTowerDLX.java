@@ -22,13 +22,15 @@ public class LogiqTowerDLX {
 	}
 
 	private void populateMatrix() throws ColumnAlreadyExistsException {
-		matrix
-			.addColumn(new Column("A"))
-			.addColumn(new Column("B"))
-			.addColumn(new Column("C"))
-			.addColumn(new Column("D"))
-			.addColumn(new Column("E"));
-
+		matrix.addColumns("0", "1", "2", "3", "4", "I", "Y", "L", "N", "U", "Q", "W", "F", "T", "S");
+		for (int row = 1; row <= playingField.getRows(); row++)
+			matrix.addColumns("*" + row);
+		for (int row = 1; row <= playingField.getRows(); row++) {
+			for (char column = 'A'; column <= 'L'; column++)
+				matrix.addColumns("" + column + row);
+		}
+		System.out.println(matrix.toMultiLineText());
+//		matrix.addRowOfNodes("A0|A", "D0|D");
 	}
 
 	public void solve() {
@@ -90,8 +92,8 @@ public class LogiqTowerDLX {
 	}
 
 	public static void main(String[] args) throws IllegalFieldSizeException, ColumnAlreadyExistsException {
-		LogiqTowerDLX logiqTower = new LogiqTowerDLX(new PlayingField(2));
-		logiqTower.solve();
+		LogiqTowerDLX logiqTower = new LogiqTowerDLX(new PlayingField(5));
+//		logiqTower.solve();
 		System.out.printf("Program finished after %.3f sec%n", (System.nanoTime() - logiqTower.startTimeNano) / 1e9);
 	}
 }
