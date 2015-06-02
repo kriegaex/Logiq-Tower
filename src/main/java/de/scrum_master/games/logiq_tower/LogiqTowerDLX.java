@@ -1,6 +1,5 @@
 package de.scrum_master.games.logiq_tower;
 
-import de.scrum_master.dancing_links.Column;
 import de.scrum_master.dancing_links.ColumnAlreadyExistsException;
 import de.scrum_master.dancing_links.Matrix;
 
@@ -36,7 +35,7 @@ public class LogiqTowerDLX {
 		populateColumnHeaders();
 		populateCentralPieces();
 		populateOuterPieces();
-		System.out.println(matrix.toMultiLineText());
+		System.out.println(matrix.rowsToText());
 	}
 
 	private void populateColumnHeaders() throws ColumnAlreadyExistsException {
@@ -74,7 +73,7 @@ public class LogiqTowerDLX {
 								nodeNames.add("" + (char)('A' + (column + shapeColumn) % playingField.getColumns()) + (row + shapeRow + 1));
 						}
 					}
-					System.out.println(nodeNames);
+//					System.out.println(nodeNames);
 					matrix.addRowOfNodes(nodeNames);
 				}
 			}
@@ -101,7 +100,7 @@ public class LogiqTowerDLX {
 								nodeNames.add("" + (char)('A' + (column + shapeColumn) % playingField.getColumns()) + (row + shapeRow + 1));
 						}
 					}
-					System.out.println(nodeNames);
+//					System.out.println(nodeNames);
 					matrix.addRowOfNodes(nodeNames);
 
 					if (piece.isPointSymmetric())
@@ -116,7 +115,7 @@ public class LogiqTowerDLX {
 								nodeNames.add("" + (char)('A' + (column + shapeColumn) % playingField.getColumns()) + (row + shapeRow + 1));
 						}
 					}
-					System.out.println(nodeNames);
+//					System.out.println(nodeNames);
 					matrix.addRowOfNodes(nodeNames);
 				}
 			}

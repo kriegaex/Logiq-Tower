@@ -58,8 +58,36 @@ public class Matrix {
 			'}';
 	}
 
-	public String toMultiLineText() {
+	public String rowsToText() {
 		// TODO: print line-wise, not column-wise
+		if (rootObject.right == rootObject)
+			return "<empty matrix>\n";
+		StringBuilder buffer = new StringBuilder();
+		for (Node column = rootObject.right; column != rootObject; column = column.right)
+			buffer.append(column.toShortString()).append(" ");
+		buffer.append("\n");
+
+		Set<Column> columnsPrinted = new HashSet<>();
+		for (Node column = rootObject.right; column != rootObject; column = column.right) {
+			rowLoop:
+			for (Node row = column.down; row != column; row = row.down) {
+				Node firstNode = row;
+				Node node = firstNode;
+				StringBuilder rowBuffer = new StringBuilder();
+				do {
+					if (columnsPrinted.contains(node.column))
+						continue rowLoop;
+					rowBuffer.append(node.toShortString()).append(" ");
+					node = node.right;
+				} while (node != firstNode);
+				buffer.append(rowBuffer).append("\n");
+			}
+			columnsPrinted.add(((Column) column));
+		}
+		return buffer.toString();
+	}
+
+	public String columnsToText() {
 		if (rootObject.right == rootObject)
 			return "<empty matrix>\n";
 		StringBuilder buffer = new StringBuilder();
@@ -82,6 +110,6 @@ public class Matrix {
 			.addRowOfNodes("A", "E")
 			.addRowOfNodes("B", "C")
 			.addRowOfNodes("E");
-		System.out.println(matrix.toMultiLineText());
+		System.out.println(matrix.columnsToText());
 	}
 }
