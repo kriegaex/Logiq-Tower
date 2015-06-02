@@ -4,8 +4,14 @@ import java.util.*;
 
 public class Matrix {
 	final String name;
-	final Column rootObject = new Column("ROOT");
+	final Column rootObject = new Column("ROOT", false);
 	final Map<String, Column> columns = new HashMap<>();
+	int mandatoryColumns = 0;
+	int optionalColumns = 0;
+
+	final Stack<Node> solutionRows = new Stack<>();
+	int mandatoryColumnsCovered = 0;
+	int optionalColumnsCovered = 0;
 
 	public Matrix(String name) {
 		this.name = name;
@@ -18,12 +24,16 @@ public class Matrix {
 		column.right = rootObject;
 		rootObject.left.right = column;
 		rootObject.left = column;
+		if (column.optional)
+			optionalColumns++;
+		else
+			mandatoryColumns++;
 		return this;
 	}
 
-	public Matrix addColumns(String... columnNames) throws ColumnAlreadyExistsException {
+	public Matrix addColumns(boolean optional, String... columnNames) throws ColumnAlreadyExistsException {
 		for (String columnName : columnNames)
-			addColumn(new Column(columnName));
+			addColumn(new Column(columnName, optional));
 		return this;
 	}
 
@@ -100,10 +110,22 @@ public class Matrix {
 		return buffer.toString();
 	}
 
+	public void solve() {
+		assert mandatoryColumns >= mandatoryColumnsCovered;
+		assert optionalColumns >= optionalColumnsCovered;
+		if (mandatoryColumnsCovered == mandatoryColumns)
+			printSolution();
+		// TODO: implement DLX algorithm here
+	}
+
+	private void printSolution() {
+		// TODO: implement printing routine here
+	}
+
 	public static void main(String[] args) throws ColumnAlreadyExistsException {
 		Matrix matrix = new Matrix("Test matrix");
 		matrix
-			.addColumns("A", "B", "C", "D", "E")
+			.addColumns(false, "A", "B", "C", "D", "E")
 			.addRowOfNodes("A", "D")
 			.addRowOfNodes("B", "C", "D")
 			.addRowOfNodes("D", "E")

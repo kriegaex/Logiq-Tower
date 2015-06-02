@@ -3,11 +3,13 @@ package de.scrum_master.dancing_links;
 public class Column extends Node {
 	int size = 0;
 	String name;
+	boolean optional;
 
-	public Column(String name) {
+	public Column(String name, boolean optional) {
 		super(null);
 		this.column = this;
 		this.name = name;
+		this.optional = optional;
 	}
 
 	public Column addNode(Node node) {
@@ -22,12 +24,13 @@ public class Column extends Node {
 	@Override
 	public String toString() {
 		return "Column{" +
-			"name='" + name + '\'' +
-			", size=" + size +
-			'}';
+				"name='" + name + '\'' +
+				", size=" + size +
+				", optional=" + optional +
+				'}';
 	}
 
 	public String toShortString() {
-		return '{' + name + ':' + size + '}';
+		return '{' + name + ':' + size + ':' + (optional ? 'T' : 'F') + '}';
 	}
 }
