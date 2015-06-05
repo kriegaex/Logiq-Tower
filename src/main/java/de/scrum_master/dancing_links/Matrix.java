@@ -115,11 +115,58 @@ public class Matrix {
 		assert optionalColumns >= optionalColumnsCovered;
 		if (mandatoryColumnsCovered == mandatoryColumns)
 			printSolution();
+		Column column = chooseColumn();
+		cover(column);
 		// TODO: implement DLX algorithm here
+		for (Node row = column.down; row != column; row = row.down) {
+			solutionRows.push(row);
+			for (Node nodeInRow = row.right; nodeInRow != row; nodeInRow = nodeInRow.right) {
+				cover(nodeInRow.column); ###
+			}
+			solutionRows.pop();
+		}
+		uncover(column);
+	}
+
+	private void cover(Column column) {
+		mandatoryColumnsCovered++;
+		column.column.left.right = column.column.right;
+		column.column.right.left = column.column.left;
+
+		Node firstNode = column;
+		Node node = firstNode;
+		do {
+			for (Node rowInColumn = node.column.down; rowInColumn != node.column; rowInColumn = rowInColumn.down) {
+
+			}
+			node = node.right;
+		} while (node != firstNode);
+		mandatoryColumnsCovered++;
+	}
+
+	private Column chooseColumn() {
+		Column mandatoryColumnWithFewestRemainingRows = null;
+		int fewestRemainingRows = Integer.MAX_VALUE;
+		for (Column column = (Column) rootObject.right; column != rootObject; column = (Column) column.right) {
+			if (!column.optional && column.size < fewestRemainingRows)
+				fewestRemainingRows = column.size;
+				mandatoryColumnWithFewestRemainingRows = column;
+		}
+		return mandatoryColumnWithFewestRemainingRows;
 	}
 
 	private void printSolution() {
 		// TODO: implement printing routine here
+		for (Node row : solutionRows) {
+			Node firstNode = row;
+			Node node = firstNode;
+			StringBuilder rowBuffer = new StringBuilder();
+			do {
+				rowBuffer.append(node.toShortString()).append(" ");
+				node = node.right;
+			} while (node != firstNode);
+			System.out.println(rowBuffer);
+		}
 	}
 
 	public static void main(String[] args) throws ColumnAlreadyExistsException {
@@ -132,6 +179,7 @@ public class Matrix {
 			.addRowOfNodes("A", "E")
 			.addRowOfNodes("B", "C")
 			.addRowOfNodes("E");
+		System.out.println(matrix.rowsToText());
 		System.out.println(matrix.columnsToText());
 	}
 }
