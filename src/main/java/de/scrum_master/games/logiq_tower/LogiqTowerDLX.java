@@ -1,7 +1,7 @@
 package de.scrum_master.games.logiq_tower;
 
 import de.scrum_master.dancing_links.ColumnAlreadyExistsException;
-import de.scrum_master.dancing_links.Matrix;
+import de.scrum_master.dancing_links.Node;
 
 import java.util.*;
 
@@ -35,7 +35,7 @@ public class LogiqTowerDLX {
 		populateColumnHeaders();
 		populateCentralPieces();
 		populateOuterPieces();
-		System.out.println(matrix.rowsToText());
+//		System.out.println(matrix.rowsToText());
 	}
 
 	private void populateColumnHeaders() throws ColumnAlreadyExistsException {
@@ -123,11 +123,56 @@ public class LogiqTowerDLX {
 	}
 
 	public void solve() {
+		matrix.solve();
+		System.out.println("Total number of solutions found = " + matrix.getSolutionsFound());
+	}
+
+	class Matrix extends de.scrum_master.dancing_links.Matrix {
+		public Matrix(String name) {
+			super(name);
+		}
+
+		@Override
+		public void printSolution(int solutionNumber, Iterable<Node> solutionRows) {
+			System.out.println("Solution #" + solutionNumber);
+
+			int fieldRows = playingField.getRows();
+			int fieldColumns = playingField.getColumns();
+			char[][] solutionChars = new char[fieldRows][fieldColumns];
+			for (Node row : solutionRows) {
+				Node firstNode = row;
+				Node node = firstNode;
+				StringBuilder rowBuffer = new StringBuilder();
+				do {
+					rowBuffer.append(node.getColumnName()).append(",");
+					node = node.getRight();
+				} while (node != firstNode);
+				List<String> columnNames = Arrays.asList(rowBuffer.toString().split(","));
+				char pieceName = columnNames
+					.stream()
+					.filter(columnName -> columnName.length() == 1)
+					.findFirst()
+					.get()
+					.charAt(0);
+				columnNames
+					.stream()
+					.filter(columnName -> columnName.matches("[A-Z][0-9]"))
+					.forEach(columnName -> {
+						int pieceRow = columnName.charAt(1) - '1';
+						int pieceColumn = columnName.charAt(0) - 'A';
+						solutionChars[pieceRow][pieceColumn] = pieceName;
+					});
+			}
+
+			for (int row = 0; row < fieldRows; row++)
+				System.out.println(new String(solutionChars[row]));
+			System.out.println();
+		}
 	}
 
 	public static void main(String[] args) throws IllegalFieldSizeException, ColumnAlreadyExistsException {
-		LogiqTowerDLX logiqTower = new LogiqTowerDLX(new PlayingField(2));
-//		logiqTower.solve();
+		LogiqTowerDLX logiqTower = new LogiqTowerDLX(new PlayingField(5));
+		logiqTower.solve();
 		System.out.printf("Program finished after %.3f sec%n", (System.nanoTime() - logiqTower.startTimeNano) / 1e9);
 	}
 }

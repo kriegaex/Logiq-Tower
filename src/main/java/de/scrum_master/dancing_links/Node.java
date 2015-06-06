@@ -11,6 +11,18 @@ public class Node {
 			column.addNode(this);
 	}
 
+	public Node getLeft() {
+		return left;
+	}
+
+	public Node getRight() {
+		return right;
+	}
+
+	public String getColumnName() {
+		return column.name;
+	}
+
 	public String toShortString() {
 		return '[' + column.name + ']';
 	}

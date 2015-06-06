@@ -6,6 +6,7 @@ public class Matrix {
 	final String name;
 	final Column rootObject = new Column("ROOT", false);
 	final Map<String, Column> columns = new HashMap<>();
+	int solutionsFound = 0;
 	int mandatoryColumns = 0;
 	int optionalColumns = 0;
 
@@ -113,50 +114,30 @@ public class Matrix {
 	public void solve() {
 		assert mandatoryColumns >= mandatoryColumnsCovered;
 		assert optionalColumns >= optionalColumnsCovered;
+
 		if (mandatoryColumnsCovered == mandatoryColumns)
-			printSolution();
+			printSolution(++solutionsFound, solutionRows);
+
 		Column column = chooseColumn();
+		if (column == null)
+			return;
 		cover(column);
-		// TODO: implement DLX algorithm here
 		for (Node row = column.down; row != column; row = row.down) {
 			solutionRows.push(row);
-			for (Node nodeInRow = row.right; nodeInRow != row; nodeInRow = nodeInRow.right) {
-				cover(nodeInRow.column); ###
+			for (Node node = row.right; node != row; node = node.right) {
+				cover(node.column);
 			}
+			solve();
 			solutionRows.pop();
+			for (Node node = row.left; node != row; node = node.left) {
+				uncover(node.column);
+			}
 		}
 		uncover(column);
 	}
 
-	private void cover(Column column) {
-		mandatoryColumnsCovered++;
-		column.column.left.right = column.column.right;
-		column.column.right.left = column.column.left;
-
-		Node firstNode = column;
-		Node node = firstNode;
-		do {
-			for (Node rowInColumn = node.column.down; rowInColumn != node.column; rowInColumn = rowInColumn.down) {
-
-			}
-			node = node.right;
-		} while (node != firstNode);
-		mandatoryColumnsCovered++;
-	}
-
-	private Column chooseColumn() {
-		Column mandatoryColumnWithFewestRemainingRows = null;
-		int fewestRemainingRows = Integer.MAX_VALUE;
-		for (Column column = (Column) rootObject.right; column != rootObject; column = (Column) column.right) {
-			if (!column.optional && column.size < fewestRemainingRows)
-				fewestRemainingRows = column.size;
-				mandatoryColumnWithFewestRemainingRows = column;
-		}
-		return mandatoryColumnWithFewestRemainingRows;
-	}
-
-	private void printSolution() {
-		// TODO: implement printing routine here
+	public void printSolution(int solutionNumber, Iterable<Node> solutionRows) {
+		System.out.println("Solution #" + solutionNumber);
 		for (Node row : solutionRows) {
 			Node firstNode = row;
 			Node node = firstNode;
@@ -167,6 +148,66 @@ public class Matrix {
 			} while (node != firstNode);
 			System.out.println(rowBuffer);
 		}
+		System.out.println();
+	}
+
+	private Column chooseColumn() {
+		Column mandatoryColumnWithFewestRemainingRows = null;
+		int fewestRemainingRows = Integer.MAX_VALUE;
+		for (Column column = (Column) rootObject.right; column != rootObject; column = (Column) column.right) {
+			if (!column.optional && column.size < fewestRemainingRows)
+				fewestRemainingRows = column.size;
+			mandatoryColumnWithFewestRemainingRows = column;
+		}
+		return mandatoryColumnWithFewestRemainingRows;
+	}
+
+	private void cover(Column column) {
+		// Delete column header
+		column.right.left = column.left;
+		column.left.right = column.right;
+
+		// Delete rows found for this column
+		for (Node row = column.down; row != column; row = row.down) {
+			for (Node node = row.right; node != row; node = node.right) {
+				// Delete node from column
+				node.down.up = node.up;
+				node.up.down = node.down;
+				node.column.size--;
+			}
+		}
+
+		// Mark column as covered
+		if (column.optional)
+			optionalColumnsCovered++;
+		else
+			mandatoryColumnsCovered++;
+	}
+
+	private void uncover(Column column) {
+		// Mark column as uncovered
+		if (column.optional)
+			optionalColumnsCovered--;
+		else
+			mandatoryColumnsCovered--;
+
+		// Undelete rows found for this column
+		for (Node row = column.up; row != column; row = row.up) {
+			for (Node node = row.left; node != row; node = node.left) {
+				// Undelete node from column
+				node.column.size++;
+				node.down.up = node;
+				node.up.down = node;
+			}
+		}
+
+		// Undelete column header
+		column.right.left = column;
+		column.left.right = column;
+	}
+
+	public int getSolutionsFound() {
+		return solutionsFound;
 	}
 
 	public static void main(String[] args) throws ColumnAlreadyExistsException {
@@ -180,6 +221,8 @@ public class Matrix {
 			.addRowOfNodes("B", "C")
 			.addRowOfNodes("E");
 		System.out.println(matrix.rowsToText());
-		System.out.println(matrix.columnsToText());
+//		System.out.println(matrix.columnsToText());
+		matrix.solve();
+		System.out.println("Total number of solutions found = " + matrix.getSolutionsFound());
 	}
 }
