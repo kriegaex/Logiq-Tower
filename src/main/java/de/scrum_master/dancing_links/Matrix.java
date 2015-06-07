@@ -4,7 +4,7 @@ import java.util.*;
 
 public class Matrix {
 	final String name;
-	final Column rootObject = new Column("ROOT", false);
+	final Column rootObject = new Column("ROOT", new HashMap<>(), true);
 	final Map<String, Column> columns = new HashMap<>();
 	int solutionsFound = 0;
 	int mandatoryColumns = 0;
@@ -34,66 +34,39 @@ public class Matrix {
 
 	public Matrix addColumns(boolean optional, String... columnNames) throws ColumnAlreadyExistsException {
 		for (String columnName : columnNames)
-			addColumn(new Column(columnName, optional));
+			addColumn(new Column(columnName, new HashMap<>(), optional));
 		return this;
 	}
 
-	public Matrix addRowOfNodes(List<String> nodeNames) {
-		Node firstNode = null;
-		Node previousNode = null;
-		for (String nodeInfo : nodeNames) {
-			Node node = createNode(nodeInfo);
-			if (firstNode == null)
-				firstNode = previousNode = node;
-			node.right = firstNode;
-			node.left = previousNode;
-			firstNode.left = node;
-			previousNode.right = node;
-			previousNode = node;
-		}
+	public Matrix addRowOfNodes(String rowName, List<String> nodeNames) {
+		Row row = new Row(rootObject, rowName, new HashMap<>());
+		for (String nodeInfo : nodeNames)
+			createNode(nodeInfo, row);
 		return this;
 	}
 
-	public Matrix addRowOfNodes(String... nodeNames) {
-		return addRowOfNodes(Arrays.asList(nodeNames));
+	public Matrix addRowOfNodes(String rowName, String... nodeNames) {
+		return addRowOfNodes(rowName, Arrays.asList(nodeNames));
 	}
 
-	public Node createNode(String columnName) {
-		return new Node(columns.get(columnName));
+	public Node createNode(String columnName, Row row) {
+		return new Node(columns.get(columnName), row);
 	}
 
 	@Override
 	public String toString() {
-		return "Matrix{" +
-			"name='" + name + '\'' +
-			'}';
+		return "Matrix{" + "name='" + name + '\'' + '}';
 	}
 
 	public String rowsToText() {
-		// TODO: print line-wise, not column-wise
 		if (rootObject.right == rootObject)
 			return "<empty matrix>\n";
 		StringBuilder buffer = new StringBuilder();
-		for (Node column = rootObject.right; column != rootObject; column = column.right)
-			buffer.append(column.toShortString()).append(" ");
-		buffer.append("\n");
-
-		Set<Column> columnsPrinted = new HashSet<>();
-		for (Node column = rootObject.right; column != rootObject; column = column.right) {
-			rowLoop:
-			for (Node row = column.down; row != column; row = row.down) {
-				Node firstNode = row;
-				Node node = firstNode;
-				StringBuilder rowBuffer = new StringBuilder();
-				do {
-					if (columnsPrinted.contains(node.column))
-						continue rowLoop;
-					rowBuffer.append(node.toShortString()).append(" ");
-					node = node.right;
-				} while (node != firstNode);
-				buffer.append(rowBuffer).append("\n");
-			}
-			columnsPrinted.add(((Column) column));
+		for (Node row = rootObject.down; row != rootObject; row = row.down) {
+			buffer.append(row.toShortString()).append(" -> ");
+			for (Node node = row.right; node != row; node = node.right)
+				buffer.append(node.toShortString()).append(" ");
+			buffer.append("\n");
 		}
 		return buffer.toString();
 	}
@@ -125,11 +98,15 @@ public class Matrix {
 		for (Node row = column.down; row != column; row = row.down) {
 			solutionRows.push(row);
 			for (Node node = row.right; node != row; node = node.right) {
+				if (node instanceof Row)
+					continue;
 				cover(node.column);
 			}
 			solve();
 			solutionRows.pop();
 			for (Node node = row.left; node != row; node = node.left) {
+				if (node instanceof Row)
+					continue;
 				uncover(node.column);
 			}
 		}
@@ -139,13 +116,10 @@ public class Matrix {
 	public void printSolution(int solutionNumber, Iterable<Node> solutionRows) {
 		System.out.println("Solution #" + solutionNumber);
 		for (Node row : solutionRows) {
-			Node firstNode = row;
-			Node node = firstNode;
 			StringBuilder rowBuffer = new StringBuilder();
-			do {
+			rowBuffer.append(row.row.toShortString()).append(" -> ");
+			for (Node node = row.row.right; node != row.row; node = node.right)
 				rowBuffer.append(node.toShortString()).append(" ");
-				node = node.right;
-			} while (node != firstNode);
 			System.out.println(rowBuffer);
 		}
 		System.out.println();
@@ -214,12 +188,12 @@ public class Matrix {
 		Matrix matrix = new Matrix("Test matrix");
 		matrix
 			.addColumns(false, "A", "B", "C", "D", "E")
-			.addRowOfNodes("A", "D")
-			.addRowOfNodes("B", "C", "D")
-			.addRowOfNodes("D", "E")
-			.addRowOfNodes("A", "E")
-			.addRowOfNodes("B", "C")
-			.addRowOfNodes("E");
+			.addRowOfNodes("1", "A", "D")
+			.addRowOfNodes("2", "B", "C", "D")
+			.addRowOfNodes("3", "D", "E")
+			.addRowOfNodes("4", "A", "E")
+			.addRowOfNodes("5", "B", "C")
+			.addRowOfNodes("6", "E");
 		System.out.println(matrix.rowsToText());
 //		System.out.println(matrix.columnsToText());
 		matrix.solve();

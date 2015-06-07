@@ -1,17 +1,17 @@
 package de.scrum_master.dancing_links;
 
-public class Column extends Node {
-	int size = 0;
-	String name;
+import java.util.Map;
+
+public class Column extends Header {
 	boolean optional;
 
-	public Column(String name, boolean optional) {
-		super(null);
+	public Column(String name, Map<String, Object> data, boolean optional) {
+		super(name, data);
 		this.column = this;
-		this.name = name;
 		this.optional = optional;
 	}
 
+	@Override
 	public Column addNode(Node node) {
 		node.down = this;
 		node.up = up;
@@ -23,14 +23,11 @@ public class Column extends Node {
 
 	@Override
 	public String toString() {
-		return "Column{" +
-				"name='" + name + '\'' +
-				", size=" + size +
-				", optional=" + optional +
-				'}';
+		return "Column{" + "name='" + name + '\'' + ", size=" + size + ", optional=" + optional + '}';
 	}
 
+	@Override
 	public String toShortString() {
-		return '{' + name + ':' + size + ':' + (optional ? 'T' : 'F') + '}';
+		return "C{" + name + ':' + size + ':' + (optional ? 'T' : 'F') + '}';
 	}
 }

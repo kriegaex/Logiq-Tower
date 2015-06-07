@@ -73,8 +73,8 @@ public class LogiqTowerDLX {
 								nodeNames.add("" + (char)('A' + (column + shapeColumn) % playingField.getColumns()) + (row + shapeRow + 1));
 						}
 					}
+					matrix.addRowOfNodes("" + piece.getSymbol() + ':' + row + ':' + column, nodeNames);
 //					System.out.println(nodeNames);
-					matrix.addRowOfNodes(nodeNames);
 				}
 			}
 		}
@@ -101,7 +101,7 @@ public class LogiqTowerDLX {
 						}
 					}
 //					System.out.println(nodeNames);
-					matrix.addRowOfNodes(nodeNames);
+					matrix.addRowOfNodes("" + piece.getSymbol() + ':' + row + ':' + column, nodeNames);
 
 					if (piece.isPointSymmetric())
 						continue;
@@ -116,7 +116,7 @@ public class LogiqTowerDLX {
 						}
 					}
 //					System.out.println(nodeNames);
-					matrix.addRowOfNodes(nodeNames);
+					matrix.addRowOfNodes("" + piece.getSymbol() + ':' + row + ':' + column + ":R", nodeNames);
 				}
 			}
 		}
@@ -140,28 +140,15 @@ public class LogiqTowerDLX {
 			int fieldColumns = playingField.getColumns();
 			char[][] solutionChars = new char[fieldRows][fieldColumns];
 			for (Node row : solutionRows) {
-				Node firstNode = row;
-				Node node = firstNode;
-				StringBuilder rowBuffer = new StringBuilder();
-				do {
-					rowBuffer.append(node.getColumnName()).append(",");
-					node = node.getRight();
-				} while (node != firstNode);
-				List<String> columnNames = Arrays.asList(rowBuffer.toString().split(","));
-				char pieceName = columnNames
-					.stream()
-					.filter(columnName -> columnName.length() == 1)
-					.findFirst()
-					.get()
-					.charAt(0);
-				columnNames
-					.stream()
-					.filter(columnName -> columnName.matches("[A-Z][0-9]"))
-					.forEach(columnName -> {
-						int pieceRow = columnName.charAt(1) - '1';
-						int pieceColumn = columnName.charAt(0) - 'A';
-						solutionChars[pieceRow][pieceColumn] = pieceName;
-					});
+				char pieceName = row.getRowName().charAt(0);
+				for (Node node = row.getRow().getNextInRow(); node != row.getRow(); node = node.getNextInRow()) {
+					String columnName = node.getColumnName();
+					if (!columnName.matches("[A-Z][0-9]"))
+						continue;
+					int pieceRow = columnName.charAt(1) - '1';
+					int pieceColumn = columnName.charAt(0) - 'A';
+					solutionChars[pieceRow][pieceColumn] = pieceName;
+				}
 			}
 
 			for (int row = 0; row < fieldRows; row++)
@@ -171,7 +158,7 @@ public class LogiqTowerDLX {
 	}
 
 	public static void main(String[] args) throws IllegalFieldSizeException, ColumnAlreadyExistsException {
-		LogiqTowerDLX logiqTower = new LogiqTowerDLX(new PlayingField(5));
+		LogiqTowerDLX logiqTower = new LogiqTowerDLX(new PlayingField(2));
 		logiqTower.solve();
 		System.out.printf("Program finished after %.3f sec%n", (System.nanoTime() - logiqTower.startTimeNano) / 1e9);
 	}
