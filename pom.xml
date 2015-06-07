@@ -12,7 +12,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.source-target.version>1.8</java.source-target.version>
 		<aspectj.version>1.8.5</aspectj.version>
-		<main-class>de.scrum_master.games.logiq_tower.LogiqTower</main-class>
+		<main-class>de.scrum_master.games.logiq_tower.LogiqTowerDLX</main-class>
 	</properties>
 
 	<build>
