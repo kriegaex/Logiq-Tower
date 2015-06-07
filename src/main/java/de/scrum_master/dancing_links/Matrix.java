@@ -155,9 +155,10 @@ public class Matrix {
 		Column mandatoryColumnWithFewestRemainingRows = null;
 		int fewestRemainingRows = Integer.MAX_VALUE;
 		for (Column column = (Column) rootObject.right; column != rootObject; column = (Column) column.right) {
-			if (!column.optional && column.size < fewestRemainingRows)
+			if (!column.optional && column.size < fewestRemainingRows) {
 				fewestRemainingRows = column.size;
-			mandatoryColumnWithFewestRemainingRows = column;
+				mandatoryColumnWithFewestRemainingRows = column;
+			}
 		}
 		return mandatoryColumnWithFewestRemainingRows;
 	}
