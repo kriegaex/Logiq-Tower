@@ -6,12 +6,11 @@
 	<artifactId>logiq-tower</artifactId>
 	<version>0.1-SNAPSHOT</version>
 
-	<name>Logic Tower</name>
+	<name>Logiq Tower</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.source-target.version>1.8</java.source-target.version>
-		<aspectj.version>1.8.5</aspectj.version>
 		<main-class>de.scrum_master.games.logiq_tower.LogiqTowerDLX</main-class>
 	</properties>
 
@@ -28,37 +27,6 @@
 						<!-- IMPORTANT -->
 						<useIncrementalCompilation>false</useIncrementalCompilation>
 					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>aspectj-maven-plugin</artifactId>
-					<version>1.7</version>
-					<configuration>
-						<showWeaveInfo>true</showWeaveInfo>
-						<source>${java.source-target.version}</source>
-						<target>${java.source-target.version}</target>
-						<Xlint>ignore</Xlint>
-						<complianceLevel>${java.source-target.version}</complianceLevel>
-						<encoding>${project.build.sourceEncoding}</encoding>
-						<verbose>true</verbose>
-					</configuration>
-					<executions>
-						<execution>
-							<!-- IMPORTANT -->
-							<phase>process-sources</phase>
-							<goals>
-								<goal>compile</goal>
-								<goal>test-compile</goal>
-							</goals>
-						</execution>
-					</executions>
-					<dependencies>
-						<dependency>
-							<groupId>org.aspectj</groupId>
-							<artifactId>aspectjtools</artifactId>
-							<version>${aspectj.version}</version>
-						</dependency>
-					</dependencies>
 				</plugin>
 				<plugin>
 					<groupId>org.codehaus.gmaven</groupId>
@@ -111,13 +79,9 @@
 		</pluginManagement>
 
 		<plugins>
-			<!--<plugin>-->
-			<!--<groupId>org.apache.maven.plugins</groupId>-->
-			<!--<artifactId>maven-compiler-plugin</artifactId>-->
-			<!--</plugin>-->
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>aspectj-maven-plugin</artifactId>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.gmaven</groupId>
@@ -150,12 +114,6 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>org.aspectj</groupId>
-				<artifactId>aspectjrt</artifactId>
-				<version>${aspectj.version}</version>
-				<scope>runtime</scope>
-			</dependency>
-			<dependency>
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
 				<version>4.11</version>
@@ -164,17 +122,13 @@
 			<dependency>
 				<groupId>org.spockframework</groupId>
 				<artifactId>spock-core</artifactId>
-				<version>0.7-groovy-2.0</version>
+				<version>1.0-groovy-2.4</version>
 				<scope>test</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.aspectj</groupId>
-			<artifactId>aspectjrt</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
