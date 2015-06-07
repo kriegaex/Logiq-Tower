@@ -8,26 +8,11 @@ import java.util.*;
 public class LogiqTowerDLX {
 	private final PlayingField playingField;
 	private final Matrix matrix;
-	private int solutionCount = 0;
-	private final SortedSet<String> solutions = new TreeSet<>();
 	private long startTimeNano = System.nanoTime();
-
-	private final int PIECES_INDEX_BASE;
-	private final int CENTRAL_INDEX_BASE;
-	private final int COORDS_INDEX_BASE;
-	private final int PIECES_COUNT;
-	private final int CENTRAL_COUNT;
-	private final int COORDS_COUNT;
 
 	public LogiqTowerDLX(PlayingField playingField) throws ColumnAlreadyExistsException {
 		this.playingField = playingField;
 		this.matrix = new Matrix("Logiq Tower (" + playingField.getRows() + " rows)");
-		PIECES_INDEX_BASE = 0;
-		PIECES_COUNT = Piece.CENTRAL_PIECES.size() + Piece.OUTER_PIECES.size();
-		CENTRAL_INDEX_BASE = PIECES_INDEX_BASE + PIECES_COUNT;
-		CENTRAL_COUNT = playingField.getRows();
-		COORDS_INDEX_BASE = CENTRAL_INDEX_BASE + CENTRAL_COUNT;
-		COORDS_COUNT = playingField.getColumns() * playingField.getRows();
 		populateMatrix();
 	}
 
