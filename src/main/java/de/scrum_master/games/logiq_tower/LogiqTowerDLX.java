@@ -109,10 +109,17 @@ public class LogiqTowerDLX {
 
 	public void solve() {
 		matrix.solve();
-		System.out.println("Total number of solutions found = " + matrix.getSolutionsFound());
+		System.out.println("Number of unique solutions    = " + matrix.uniqueSolutions.size());
+		System.out.println("Number of duplicate solutions = " + matrix.nonUniqueSolutionsFound);
+		System.out.println("-------------------------------------");
+		System.out.println("Total number of solutions     = " + matrix.getSolutionsFound());
+		System.out.println();
 	}
 
 	class Matrix extends de.scrum_master.dancing_links.Matrix {
+		Set<String> uniqueSolutions = new HashSet<>();
+		int nonUniqueSolutionsFound = 0;
+
 		public Matrix(String name) {
 			super(name);
 		}
@@ -149,14 +156,46 @@ public class LogiqTowerDLX {
 					});
 			}
 
-			for (int row = 0; row < fieldRows; row++)
-				System.out.println(new String(solutionChars[row]));
-			System.out.println();
+			String solutionText = createModifiedSolution(solutionChars, 0, false);
+			System.out.println(solutionText);
+			for (boolean rotateBy180 : new boolean[] { true, false }) {
+				for (int i = 0; i < fieldColumns; i++) {
+					String duplicateSolution = createModifiedSolution(solutionChars, i, rotateBy180);
+					if (uniqueSolutions.contains(duplicateSolution)) {
+						System.out.println(
+							"Solution is a duplicate (" +
+							(rotateBy180 ? "" : "un") + "rotated, scrolled by " + i + ") of"
+						);
+						System.out.println(duplicateSolution);
+						nonUniqueSolutionsFound++;
+						return;
+					}
+				}
+			}
+			uniqueSolutions.add(solutionText);
+		}
+
+		private String createModifiedSolution(char[][] originalSolution, int scrollColumns, boolean rotateBy180) {
+			int rows = playingField.getRows();
+			int columns = playingField.getColumns();
+			char[][] modifiedSolution = new char[originalSolution.length][originalSolution[0].length];
+			StringBuilder buffer = new StringBuilder();
+			for (int row = 0; row < rows; row++) {
+				int modifiedRow = rotateBy180 ? rows - 1 - row : row;
+				for (int column = 0; column < columns; column++) {
+					int modifiedColumn = rotateBy180
+						? (columns - 1 - column + scrollColumns) % columns
+						: (column + scrollColumns) % columns;
+					modifiedSolution[row][column] = originalSolution[modifiedRow][modifiedColumn];
+				}
+				buffer.append(modifiedSolution[row]).append('\n');
+			}
+			return buffer.toString();
 		}
 	}
 
 	public static void main(String[] args) throws IllegalFieldSizeException, ColumnAlreadyExistsException {
-		LogiqTowerDLX logiqTower = new LogiqTowerDLX(new PlayingField(5));
+		LogiqTowerDLX logiqTower = new LogiqTowerDLX(new PlayingField(2));
 		logiqTower.solve();
 		System.out.printf("Program finished after %.3f sec%n", (System.nanoTime() - logiqTower.startTimeNano) / 1e9);
 	}
