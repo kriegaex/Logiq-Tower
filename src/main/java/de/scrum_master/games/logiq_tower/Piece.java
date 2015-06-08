@@ -71,12 +71,6 @@ public class Piece {
 		return shapeRotated;
 	}
 
-	public int[][] getBlockedPositionsAt(int row, int column, boolean isRotated) {
-		return isRotated
-			? blockedPositionsRotated[row][column]
-			: blockedPositions[row][column];
-	}
-
 	public Piece(char symbol, boolean isCentral, boolean[][] shape) {
 		this.symbol = symbol;
 		this.isCentral = isCentral;
@@ -169,30 +163,6 @@ public class Piece {
 
 	public int getRows() {
 		return rows;
-	}
-
-	public int getCubeCount() {
-		return cubeCount;
-	}
-
-	public boolean isAvailable() {
-		return available;
-	}
-
-	public void setAvailable(boolean available) {
-//		this.available = available;
-		if (available) {
-			if (isCentral)
-				CENTRAL_PIECES_AVAILABLE.add(this);
-			else
-				OUTER_PIECES_AVAILABLE.add(this);
-		}
-		else {
-			if (isCentral)
-				CENTRAL_PIECES_AVAILABLE.remove(this);
-			else
-				OUTER_PIECES_AVAILABLE.remove(this);
-		}
 	}
 
 	public boolean isCentral() {
