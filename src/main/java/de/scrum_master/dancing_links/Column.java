@@ -2,13 +2,11 @@ package de.scrum_master.dancing_links;
 
 public class Column extends Node {
 	int size = 0;
-	String name;
 	boolean optional;
 
 	public Column(String name, boolean optional) {
-		super(null);
+		super(null, name);
 		this.column = this;
-		this.name = name;
 		this.optional = optional;
 	}
 

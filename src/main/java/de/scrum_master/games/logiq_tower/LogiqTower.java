@@ -5,12 +5,12 @@ import de.scrum_master.dancing_links.Node;
 
 import java.util.*;
 
-public class LogiqTowerDLX {
+public class LogiqTower {
 	private final PlayingField playingField;
 	private final Matrix matrix;
 	private long startTimeNano = System.nanoTime();
 
-	public LogiqTowerDLX(PlayingField playingField) throws ColumnAlreadyExistsException {
+	public LogiqTower(PlayingField playingField) throws ColumnAlreadyExistsException {
 		this.playingField = playingField;
 		this.matrix = new Matrix("Logiq Tower (" + playingField.getRows() + " rows)");
 		populateMatrix();
@@ -47,18 +47,18 @@ public class LogiqTowerDLX {
 						// in order to avoid lots of rotated solutions
 						continue;
 					}
-					List<String> nodeNames = new ArrayList<>();
-					nodeNames.add("" + piece.getSymbol());
-					nodeNames.add("*" + (row + 1));
+					List<String> columnNames = new ArrayList<>();
+					columnNames.add("" + piece.getSymbol());
+					columnNames.add("*" + (row + 1));
 					boolean[][] shape = piece.getShape();
 					for (int shapeRow = 0; shapeRow < piece.getRows(); shapeRow++) {
 						for (int shapeColumn = 0; shapeColumn < piece.getColumns(); shapeColumn++) {
 							if (shape[shapeRow][shapeColumn])
-								nodeNames.add("" + (char)('A' + (column + shapeColumn) % playingField.getColumns()) + (row + shapeRow + 1));
+								columnNames.add("" + (char)('A' + (column + shapeColumn) % playingField.getColumns()) + (row + shapeRow + 1));
 						}
 					}
-//					System.out.println(nodeNames);
-					matrix.addRowOfNodes(nodeNames);
+//					System.out.println(columnNames);
+					matrix.addRowOfNodes("" + piece.getSymbol(), columnNames);
 				}
 			}
 		}
@@ -75,32 +75,32 @@ public class LogiqTowerDLX {
 						// per definition there is always a central piece there
 						continue;
 					}
-					List<String> nodeNames = new ArrayList<>();
-					nodeNames.add("" + piece.getSymbol());
+					List<String> columnNames = new ArrayList<>();
+					columnNames.add("" + piece.getSymbol());
 					boolean[][] shape = piece.getShape();
 					for (int shapeRow = 0; shapeRow < piece.getRows(); shapeRow++) {
 						for (int shapeColumn = 0; shapeColumn < piece.getColumns(); shapeColumn++) {
 							if (shape[shapeRow][shapeColumn])
-								nodeNames.add("" + (char)('A' + (column + shapeColumn) % playingField.getColumns()) + (row + shapeRow + 1));
+								columnNames.add("" + (char)('A' + (column + shapeColumn) % playingField.getColumns()) + (row + shapeRow + 1));
 						}
 					}
-//					System.out.println(nodeNames);
-					matrix.addRowOfNodes(nodeNames);
+//					System.out.println(columnNames);
+					matrix.addRowOfNodes("" + piece.getSymbol(), columnNames);
 
 					if (piece.isPointSymmetric())
 						continue;
 
-					nodeNames.clear();
-					nodeNames.add("" + piece.getSymbol());
+					columnNames.clear();
+					columnNames.add("" + piece.getSymbol());
 					shape = piece.getShapeRotated();
 					for (int shapeRow = 0; shapeRow < piece.getRows(); shapeRow++) {
 						for (int shapeColumn = 0; shapeColumn < piece.getColumns(); shapeColumn++) {
 							if (shape[shapeRow][shapeColumn])
-								nodeNames.add("" + (char)('A' + (column + shapeColumn) % playingField.getColumns()) + (row + shapeRow + 1));
+								columnNames.add("" + (char)('A' + (column + shapeColumn) % playingField.getColumns()) + (row + shapeRow + 1));
 						}
 					}
-//					System.out.println(nodeNames);
-					matrix.addRowOfNodes(nodeNames);
+//					System.out.println(columnNames);
+					matrix.addRowOfNodes("" + piece.getSymbol(), columnNames);
 				}
 			}
 		}
@@ -120,7 +120,7 @@ public class LogiqTowerDLX {
 		int nonUniqueSolutionsFound = 0;
 
 		public Matrix(String name) {
-			super(name);
+			super(name, false);
 		}
 
 		@Override
@@ -194,7 +194,7 @@ public class LogiqTowerDLX {
 	}
 
 	public static void main(String[] args) throws IllegalFieldSizeException, ColumnAlreadyExistsException {
-		LogiqTowerDLX logiqTower = new LogiqTowerDLX(new PlayingField(5));
+		LogiqTower logiqTower = new LogiqTower(new PlayingField(5));
 		logiqTower.solve();
 		System.out.printf("Program finished after %.3f sec%n", (System.nanoTime() - logiqTower.startTimeNano) / 1e9);
 	}

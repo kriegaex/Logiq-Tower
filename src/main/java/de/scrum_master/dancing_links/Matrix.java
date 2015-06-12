@@ -6,6 +6,8 @@ public class Matrix {
 	final String name;
 	final Column rootObject = new Column("ROOT", false);
 	final Map<String, Column> columns = new HashMap<>();
+	final boolean minimiseRows;
+	int minimalRowsCount = Integer.MAX_VALUE;
 	int solutionsFound = 0;
 	int mandatoryColumns = 0;
 	int optionalColumns = 0;
@@ -14,8 +16,9 @@ public class Matrix {
 	int mandatoryColumnsCovered = 0;
 	int optionalColumnsCovered = 0;
 
-	public Matrix(String name) {
+	public Matrix(String name, boolean minimiseRows) {
 		this.name = name;
+		this.minimiseRows = minimiseRows;
 	}
 
 	public Matrix addColumn(Column column) throws ColumnAlreadyExistsException {
@@ -38,11 +41,11 @@ public class Matrix {
 		return this;
 	}
 
-	public Matrix addRowOfNodes(List<String> nodeNames) {
+	public Matrix addRowOfNodes(String rowName, List<String> columnNames) {
 		Node firstNode = null;
 		Node previousNode = null;
-		for (String nodeInfo : nodeNames) {
-			Node node = createNode(nodeInfo);
+		for (String columnName : columnNames) {
+			Node node = createNode(columnName, rowName);
 			if (firstNode == null)
 				firstNode = previousNode = node;
 			node.right = firstNode;
@@ -54,12 +57,12 @@ public class Matrix {
 		return this;
 	}
 
-	public Matrix addRowOfNodes(String... nodeNames) {
-		return addRowOfNodes(Arrays.asList(nodeNames));
+	public Matrix addRowOfNodes(String rowName, String... columnNames) {
+		return addRowOfNodes(rowName, Arrays.asList(columnNames));
 	}
 
-	public Node createNode(String columnName) {
-		return new Node(columns.get(columnName));
+	public Node createNode(String columnName, String nodeName) {
+		return new Node(columns.get(columnName), nodeName);
 	}
 
 	@Override
@@ -70,7 +73,6 @@ public class Matrix {
 	}
 
 	public String rowsToText() {
-		// TODO: print line-wise, not column-wise
 		if (rootObject.right == rootObject)
 			return "<empty matrix>\n";
 		StringBuilder buffer = new StringBuilder();
@@ -85,6 +87,7 @@ public class Matrix {
 				Node firstNode = row;
 				Node node = firstNode;
 				StringBuilder rowBuffer = new StringBuilder();
+				rowBuffer.append(node.name).append(" -> ");
 				do {
 					if (columnsPrinted.contains(node.column))
 						continue rowLoop;
@@ -115,8 +118,20 @@ public class Matrix {
 		assert mandatoryColumns >= mandatoryColumnsCovered;
 		assert optionalColumns >= optionalColumnsCovered;
 
-		if (mandatoryColumnsCovered == mandatoryColumns)
+		if (solutionRows.size() > minimalRowsCount)
+			return;
+
+		if (mandatoryColumnsCovered == mandatoryColumns) {
+			if (minimiseRows && solutionRows.size() < minimalRowsCount) {
+				minimalRowsCount = solutionRows.size();
+				solutionsFound = 0;
+				System.out.println("------------------------------------------------------------");
+				System.out.println("New minimal rows count = " + minimalRowsCount);
+				System.out.println("------------------------------------------------------------\n");
+			}
 			printSolution(++solutionsFound, solutionRows);
+			return;
+		}
 
 		Column column = chooseColumn();
 		if (column == null)
@@ -212,15 +227,15 @@ public class Matrix {
 	}
 
 	public static void main(String[] args) throws ColumnAlreadyExistsException {
-		Matrix matrix = new Matrix("Test matrix");
+		Matrix matrix = new Matrix("Test matrix", true);
 		matrix
 			.addColumns(false, "A", "B", "C", "D", "E")
-			.addRowOfNodes("A", "D")
-			.addRowOfNodes("B", "C", "D")
-			.addRowOfNodes("D", "E")
-			.addRowOfNodes("A", "E")
-			.addRowOfNodes("B", "C")
-			.addRowOfNodes("E");
+			.addRowOfNodes("1", "A", "D")
+			.addRowOfNodes("2", "B", "C", "D")
+			.addRowOfNodes("3", "D", "E")
+			.addRowOfNodes("4", "A", "E")
+			.addRowOfNodes("5", "B", "C")
+			.addRowOfNodes("6", "E");
 		System.out.println(matrix.rowsToText());
 //		System.out.println(matrix.columnsToText());
 		matrix.solve();
