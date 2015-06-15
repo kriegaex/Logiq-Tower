@@ -5,8 +5,6 @@ package de.scrum_master.games.lone_rook;
 import java.io.PrintStream;
 import java.util.Vector;
 
-import vhs.Timer;
-
 /**
  *
  * @author Alexander Kriegisch
