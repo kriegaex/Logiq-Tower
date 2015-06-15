@@ -129,7 +129,8 @@ public class Matrix {
 				System.out.println("New minimal rows count = " + minimalRowsCount);
 				System.out.println("------------------------------------------------------------\n");
 			}
-			printSolution(++solutionsFound, solutionRows);
+			if (isValidSolution())
+				printSolution(++solutionsFound, solutionRows);
 			return;
 		}
 
@@ -149,6 +150,16 @@ public class Matrix {
 			}
 		}
 		uncover(column);
+	}
+
+	/**
+	 * Please override this method if you need an additional check before a solution is printed
+	 *
+	 * @return 'true' if the solution is valid, 'false' if it is not;
+	 * this base implementation is a dummy and always returns 'true'
+	 */
+	public boolean isValidSolution() {
+		return true;
 	}
 
 	public void printSolution(int solutionNumber, Iterable<Node> solutionRows) {
