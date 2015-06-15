@@ -11,6 +11,8 @@ import java.util.Set;
 public class LoneRook {
 	static final int NUM_ROWS = 8;
 	static final int NUM_COLS = 8;
+	static final int START_ROW = 4;
+	static final int START_COL = 3;
 
 	private final Matrix matrix;
 	private long startTimeNano = System.nanoTime();
@@ -38,6 +40,12 @@ public class LoneRook {
 		for (int startRow = 0; startRow < NUM_ROWS; startRow++) {
 			for (int startColumn = 0; startColumn < NUM_COLS; startColumn++) {
 				for (int endRow = 0; endRow < NUM_ROWS; endRow++) {
+					// Skip horizontal moves from start position in order to eliminate some symmetries
+					// (e.g. d4-d8 is equivalent to d4-h4 and d4-d1 to d4-a4)
+					if (startRow == START_ROW && startColumn == START_COL && endRow == START_ROW) {
+						System.out.printf("(%d,%d) / %d%n", startRow, startColumn, endRow);
+						continue;
+					}
 					for (int endColumn = 0; endColumn < NUM_COLS; endColumn++) {
 						// Only straight (horizontal or vertical) moves for rooks in chess
 						if (startRow != endRow && startColumn != endColumn)
@@ -66,11 +74,13 @@ public class LoneRook {
 		if (startColumn == endColumn) {
 			// Vertical move
 			increment = startRow < endRow ? 1 : -1;
+			// Skip end field so as not to block it twice
 			for (int row = startRow; row != endRow; row += increment)
 				columnNames.add(coordinatesToChessNotation(startColumn, row));
 		} else {
 			// Horizontal move
 			increment = startColumn < endColumn ? 1 : -1;
+			// Skip end field so as not to block it twice
 			for (int column = startColumn; column != endColumn; column += increment)
 				columnNames.add(coordinatesToChessNotation(column, startRow));
 		}
